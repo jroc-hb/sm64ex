@@ -13,7 +13,7 @@
 
 static struct ControllerAPI *controller_implementations[] = {
     &controller_recorded_tas,
-    #if defined(CAPI_SDL2) || defined(CAPI_SDL1)
+    #if defined(CAPI_SDL2) || defined(CAPI_SDL1) || defined(TARGET_XBOX)
     &controller_sdl,
     #endif
     &controller_keyboard,
