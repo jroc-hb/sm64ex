@@ -39,6 +39,12 @@
 #include "pc/discord/discordrpc.h"
 #endif
 
+#ifdef TARGET_XBOX
+#include <hal/debug.h>
+#include <hal/video.h>
+#include <windows.h>
+#endif
+
 OSMesg D_80339BEC;
 OSMesgQueue gSIEventMesgQueue;
 
@@ -210,6 +216,9 @@ void main_func(void) {
     # else
     #  define RAPI_NAME "OpenGL"
     # endif
+    #elif defined(TARGET_XBOX)
+    rendering_api = &gfx_xbox_renderer_api;
+    wm_api = &gfx_xbox_wm_api;
     #else
     #error No rendering API!
     #endif
@@ -224,7 +233,7 @@ void main_func(void) {
     gfx_init(wm_api, rendering_api, window_title);
     wm_api->set_keyboard_callbacks(keyboard_on_key_down, keyboard_on_key_up, keyboard_on_all_keys_up);
 
-    #if defined(AAPI_SDL1) || defined(AAPI_SDL2)
+    #if defined(AAPI_SDL1) || defined(AAPI_SDL2) || defined(TARGET_XBOX)
     if (audio_api == NULL && audio_sdl.init()) 
         audio_api = &audio_sdl;
     #endif
@@ -266,8 +275,30 @@ void main_func(void) {
 #endif
 }
 
+#if defined(TARGET_XBOX)
+#include <nxdk/mount.h>
+#include <winapi/fileapi.h>
+#include "xbox.h"
+int main(void)
+{
+    if (!nxIsDriveMounted('E')) {
+        nxMountDrive('E', "\\Device\\Harddisk0\\Partition1\\");
+    }
+    CreateDirectoryA(USER_DATA_TITLE_PATH, NULL);
+    CreateDirectoryA(USER_DATA_SAVE_PATH, NULL);
+    main_func();
+    return 0;
+}
+#elif defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+int WINAPI WinMain(UNUSED HINSTANCE hInstance, UNUSED HINSTANCE hPrevInstance, UNUSED LPSTR pCmdLine, UNUSED int nCmdShow) {
+    main_func();
+    return 0;
+}
+#else
 int main(int argc, char *argv[]) {
     parse_cli_opts(argc, argv);
     main_func();
     return 0;
 }
+#endif

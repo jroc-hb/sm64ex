@@ -9,6 +9,10 @@
 #include <emscripten.h>
 #endif
 
+#ifdef TARGET_XBOX
+#include "xbox.h"
+#endif
+
 extern OSMgrArgs piMgrArgs;
 
 u64 osClockRate = 62500000;
@@ -148,7 +152,11 @@ s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes)
         ret = 0;
     }
 #else
+#ifdef TARGET_XBOX
+    FILE *fp = fopen(USER_DATA_SAVE_PATH "\\sm64_save_file.bin", "rb");
+#else
     fs_file_t *fp = fs_open(SAVE_FILENAME);
+#endif
     if (fp == NULL) {
         return -1;
     }
@@ -178,7 +186,11 @@ s32 osEepromLongWrite(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes
     }, content);
     s32 ret = 0;
 #else
+#ifdef TARGET_XBOX
+    FILE* fp = fopen(USER_DATA_SAVE_PATH "\\sm64_save_file.bin", "wb");
+#else
     FILE *fp = fopen(fs_get_write_path(SAVE_FILENAME), "wb");
+#endif
     if (fp == NULL) {
         return -1;
     }

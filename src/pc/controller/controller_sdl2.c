@@ -5,7 +5,12 @@
 #include <stdbool.h>
 #include <math.h>
 
+#ifdef TARGET_XBOX
+#include <SDL.h>
+extern int g_xbox_exit_button_state;
+#else
 #include <SDL2/SDL.h>
+#endif
 
 // Analog camera movement by Pathétique (github.com/vrmiguel), y0shin and Mors
 // Contribute or communicate bugs at github.com/vrmiguel/sm64-analog-camera
@@ -261,6 +266,10 @@ static void controller_sdl_read(OSContPad *pad) {
         int stick_y = -righty / 0x100;
         pad->ext_stick_y = stick_y == 128 ? 127 : stick_y;
     }
+    
+    #ifdef TARGET_XBOX
+        g_xbox_exit_button_state = SDL_GameControllerGetButton(sdl_cntrl, SDL_CONTROLLER_BUTTON_BACK);
+    #endif
 }
 
 static void controller_sdl_rumble_play(f32 strength, f32 length) {
