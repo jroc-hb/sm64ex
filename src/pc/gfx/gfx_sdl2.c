@@ -295,7 +295,7 @@ static inline void sync_framerate_with_timer(void) {
         // Only sleep if we have time to spare
         const double remain = frame_rate - frame_length;
         // Sleep remaining time away
-        sys_sleep(remain / perf_freq * 1000000.0);
+        SDL_Delay(remain / perf_freq * 1000000.0);
         // Assume we slept the required amount of time to keep the timer stable
         frame_time = now + remain;
     } else {

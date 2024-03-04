@@ -80,7 +80,7 @@ WINDOWS_BUILD ?= 0
 # Xbox nxdk setup
 ifeq ($(TARGET_XBOX), 1)
   # No further detection needed
-  XBE_TITLE = sm64
+  XBE_TITLE = sm64exbox
   NXDK_SDL = y
   NXDK_DIR = $(CURDIR)/../nxdk/
 endif
@@ -97,9 +97,11 @@ else
   endif
 endif
 
-ifeq ($(TARGET_WEB),0)
-  ifeq ($(HOST_OS),Windows)
-    WINDOWS_BUILD := 1
+ifeq ($(TARGET_XBOX), 0)
+  ifeq ($(TARGET_WEB),0)
+    ifeq ($(HOST_OS),Windows)
+      WINDOWS_BUILD := 1
+    endif
   endif
 endif
 
@@ -235,7 +237,12 @@ ifeq ($(OSX_BUILD),1) # Modify GFX & SDL2 for OSX GL
      VERSION_CFLAGS += -DOSX_BUILD
 endif
 
-VERSION_ASFLAGS := --defsym AVOID_UB=1
+ifeq ($(TARGET_XBOX),1)
+  # Not supported by clang assembler
+  VERSION_ASFLAGS :=
+else
+  VERSION_ASFLAGS := --defsym AVOID_UB=1
+endif
 COMPARE := 0
 
 ifeq ($(TARGET_WEB),1)

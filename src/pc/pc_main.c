@@ -19,6 +19,7 @@
 
 #include "gfx/gfx_dxgi.h"
 #include "gfx/gfx_sdl.h"
+#include "gfx/gfx_xbox.h"
 
 #include "audio/audio_api.h"
 #include "audio/audio_sdl.h"
@@ -180,10 +181,11 @@ static void on_anim_frame(double time) {
 void main_func(void) {
     const char *gamedir = gCLIOpts.GameDir[0] ? gCLIOpts.GameDir : FS_BASEDIR;
     const char *userpath = gCLIOpts.SavePath[0] ? gCLIOpts.SavePath : sys_user_path();
-    fs_init(sys_ropaths, gamedir, userpath);
+    #ifndef TARGET_XBOX
+        fs_init(sys_ropaths, gamedir, userpath);
 
-    configfile_load(configfile_name());
-
+        configfile_load(configfile_name());
+    #endif
     if (gCLIOpts.FullScreen == 1)
         configWindow.fullscreen = true;
     else if (gCLIOpts.FullScreen == 2)
@@ -195,7 +197,7 @@ void main_func(void) {
     main_pool_init(pool, pool + poolsize / sizeof(pool[0]));
     gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
 
-    #if defined(WAPI_SDL1) || defined(WAPI_SDL2)
+    #if defined(WAPI_SDL1) || defined(WAPI_SDL2) || defined(TARGET_XBOX)
     wm_api = &gfx_sdl;
     #elif defined(WAPI_DXGI)
     wm_api = &gfx_dxgi;
@@ -223,8 +225,7 @@ void main_func(void) {
     #error No rendering API!
     #endif
 
-    char window_title[96] =
-    "Super Mario 64 EX (" RAPI_NAME ")"
+    char window_title[96] = "Super Mario 64 EXbox";
     #ifdef NIGHTLY
     " nightly " GIT_HASH
     #endif

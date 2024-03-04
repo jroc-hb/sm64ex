@@ -1,4 +1,4 @@
-#ifdef CAPI_SDL2
+#if defined(TARGET_XBOX) || (!defined(_WIN32) && !defined(_WIN64))
 
 #include <stdio.h>
 #include <stdint.h>
@@ -96,6 +96,7 @@ static void controller_sdl_bind(void) {
 static void controller_sdl_init(void) {
     // try loading an external gamecontroller mapping file
     uint64_t gcsize = 0;
+    #ifndef TARGET_XBOX //FIX ME
     void *gcdata = fs_load_file("gamecontrollerdb.txt", &gcsize);
     if (gcdata && gcsize) {
         SDL_RWops *rw = SDL_RWFromConstMem(gcdata, gcsize);
@@ -106,6 +107,7 @@ static void controller_sdl_init(void) {
         }
         free(gcdata);
     }
+    #endif
 
     if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
