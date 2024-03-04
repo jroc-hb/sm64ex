@@ -152,7 +152,8 @@ s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes)
         ret = 0;
     }
 #else
-#ifdef TARGET_XBOX
+#ifdef TARGET_XBOX // FIX ME
+    return -1; 
     FILE *fp = fopen(USER_DATA_SAVE_PATH "\\sm64_save_file.bin", "rb");
 #else
     fs_file_t *fp = fs_open(SAVE_FILENAME);

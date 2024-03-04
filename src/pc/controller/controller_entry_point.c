@@ -6,7 +6,11 @@
 
 #include "controller_recorded_tas.h"
 #include "controller_keyboard.h"
+#if !defined(TARGET_XBOX) && (defined(_WIN32) || defined(_WIN64))
+#include "controller_xinput.h"
+#else
 #include "controller_sdl.h"
+#endif
 
 // Analog camera movement by Pathétique (github.com/vrmiguel), y0shin and Mors
 // Contribute or communicate bugs at github.com/vrmiguel/sm64-analog-camera

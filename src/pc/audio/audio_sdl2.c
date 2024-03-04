@@ -1,4 +1,4 @@
-#ifdef AAPI_SDL2
+// #ifdef AAPI_SDL2
 
 #if defined(TARGET_XBOX) || defined(__MINGW32__)
 #include "SDL.h"
@@ -66,4 +66,4 @@ struct AudioAPI audio_sdl = {
     audio_sdl_shutdown
 };
 
-#endif
+// #endif

@@ -1,11 +1,33 @@
+#ifndef TARGET_XBOX
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
+#ifndef TARGET_XBOX
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <dirent.h>
+#else 
+    #include <winapi/fileapi.h>
+    #include <stddef.h>
+    
+    struct stat {
+        size_t st_size;
+        int st_mode;
+        int st_mtime;
+        int st_atime;
+        int st_nlink;
+    };
+
+    int stat(const char *path, struct stat *buf) {
+        return 0;
+    }
+
+    #ifndef S_IFMT
+        #define S_IFMT 0xF000
+    #endif
+#endif
 #include <ctype.h>
 #ifdef _WIN32
 #include <direct.h>
@@ -380,12 +402,20 @@ const char *fs_convert_path(char *buf, const size_t bufsiz, const char *path)  {
 
 bool fs_sys_file_exists(const char *name) {
     struct stat st;
-    return (stat(name, &st) == 0 && S_ISREG(st.st_mode));
+    #ifdef TARGET_XBOX
+        return 0;
+    #else
+        return (stat(name, &st) == 0 && S_ISREG(st.st_mode));
+    #endif
 }
 
 bool fs_sys_dir_exists(const char *name) {
     struct stat st;
-    return (stat(name, &st) == 0 && S_ISDIR(st.st_mode));
+    #ifdef TARGET_XBOX
+        return 0;
+    #else
+        return (stat(name, &st) == 0 && S_ISDIR(st.st_mode));
+    #endif
 }
 
 bool fs_sys_walk(const char *base, walk_fn_t walk, void *user, const bool recur) {
@@ -468,3 +498,4 @@ bool fs_sys_copy_file(const char *oldname, const char *newname) {
 
     return ret;
 }
+#endif
