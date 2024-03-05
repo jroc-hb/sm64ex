@@ -152,8 +152,7 @@ s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes)
         ret = 0;
     }
 #else
-#ifdef TARGET_XBOX // FIX ME
-    return -1; 
+#ifdef TARGET_XBOX // FIXME Should use actual file system
     FILE *fp = fopen(USER_DATA_SAVE_PATH "\\sm64_save_file.bin", "rb");
 #else
     fs_file_t *fp = fs_open(SAVE_FILENAME);
@@ -161,11 +160,19 @@ s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes)
     if (fp == NULL) {
         return -1;
     }
+    #ifdef TARGET_XBOX
+    if (fread(content, 1, 512, fp) == 512) {
+        memcpy(buffer, content + address * 8, nbytes);
+        ret = 0;
+    }
+    fclose(fp);
+    #else
     if (fs_read(fp, content, 512) == 512) {
         memcpy(buffer, content + address * 8, nbytes);
         ret = 0;
     }
     fs_close(fp);
+    #endif
 #endif
     return ret;
 }
@@ -195,8 +202,13 @@ s32 osEepromLongWrite(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes
     if (fp == NULL) {
         return -1;
     }
+    #ifdef TARGET_XBOX // FIXME Should use actual file system
     s32 ret = fwrite(content, 1, 512, fp) == 512 ? 0 : -1;
     fclose(fp);
+    #else
+    s32 ret = fwrite(content, 1, 512, fp) == 512 ? 0 : -1;
+    fclose(fp);
+    #endif
 #endif
     return ret;
 }
