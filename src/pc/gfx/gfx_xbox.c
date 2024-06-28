@@ -243,11 +243,11 @@ static struct timespec gfx_xbox_wm_timeadd(
 
 static void gfx_xbox_wm_swap_buffers_end(void)
 {
-    // A naive sync up to run at 30Hz by measuring against the 60Hz native
+    // Sync up to run at 60Hz by measuring against the 60Hz native
     // vblank interval
     static int last = 0;
     int now = pb_get_vbl_counter();
-    while ((now - last) < 2) {
+    while ((now - last) < 1) { // Wait for one vblank interval
         now = pb_wait_for_vbl();
     }
     last = now;
